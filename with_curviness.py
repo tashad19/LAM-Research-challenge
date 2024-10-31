@@ -41,7 +41,7 @@ class ContourApp:
         self.curviness_label = tk.Label(master, text="Curviness Factor:")
         self.curviness_label.pack()
         self.curviness_entry = tk.Entry(master)
-        self.curviness_entry.insert(0, "0.5")  # Default curviness factor
+        self.curviness_entry.insert(0, "100000")  # Default curviness factor
         self.curviness_entry.pack()
 
         self.threshold_label = tk.Label(master, text="Threshold Value:")
