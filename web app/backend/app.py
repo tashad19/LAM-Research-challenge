@@ -50,19 +50,34 @@ def process_image():
     smoothing_factor = float(data.get('smoothingFactor', 0.001))
     curviness_factor = float(data.get('curvinessFactor', 100000))
 
+    # Decode the base64 image to an OpenCV image
     image = decode_image(image_data)
-    contour = detect_contours_sobel(image, threshold_value)
+    
+    # Define the cropping coordinates
+    x_start = 100  # Example: starting x-coordinate
+    y_start = 100  # Example: starting y-coordinate
+    width = 300   # Example: width of the cropped area
+    height = 200  # Example: height of the cropped area
+
+    # Crop the image
+    cropped_image = image[y_start:y_start + height, x_start:x_start + width]
+
+    # Use the cropped image for contour detection
+    contour = detect_contours_sobel(cropped_image, threshold_value)
     if contour is None:
         return jsonify({'error': 'No contour detected'}), 400
 
+    # Smooth the detected contour
     smoothed_contour = smooth_contour(contour, smoothing_factor, curviness_factor)
-    # Convert the processed image to base64 for sending back
-    preview_img = image.copy()
+    
+    # Draw the contour on the cropped image and encode it to base64
+    preview_img = cropped_image.copy()
     cv2.drawContours(preview_img, [smoothed_contour], -1, (0, 255, 0), 2)
     _, buffer = cv2.imencode('.jpg', preview_img)
     preview_image_base64 = base64.b64encode(buffer).decode('utf-8')
 
     return jsonify({'processedImage': preview_image_base64, 'contour': smoothed_contour.tolist()})
+
 
 @app.route('/export-dxf', methods=['POST'])
 def export_dxf():
